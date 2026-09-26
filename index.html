@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ISRO Tracker — Upcoming Launches & Missions (Live Countdown)</title>
+<meta name="description" content="Live list of upcoming rocket launches from ISRO and worldwide with countdowns. Chandrayaan, Gaganyaan, GSLV, PSLV, LVM3 — next launch time, rocket and mission details.">
+<meta name="robots" content="index, follow">
+<link rel="canonical" href="https://isrotracker.pages.dev/">
+<meta name="theme-color" content="#0f172a">
+<meta property="og:title" content="ISRO Tracker — Upcoming Launches Live">
+<meta property="og:description" content="Next ISRO and worldwide launches with live countdowns.">
+<meta property="og:type" content="website">
+<meta name="google-site-verification" content="GlkDu5ZL-CyyKjwPSj9d9X3Y2qsHUj_qAwRwxiLr7nI">
+<script type="application/ld+json">
+{"@context":"https://schema.org","@type":"WebSite","name":"ISRO Tracker","url":"https://isrotracker.pages.dev/","inLanguage":"en"}
+</script>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;background:#0f172a;color:#f1f5f9;line-height:1.6}
+.wrap{max-width:900px;margin:0 auto;padding:16px}
+h1{font-size:clamp(1.4rem,4.5vw,2rem)}
+.sub{color:#94a3b8;font-size:.95rem;max-width:680px;margin-top:6px}
+.btns{display:flex;gap:10px;margin:16px 0}
+button{font:inherit;border:0;border-radius:10px;padding:10px 16px;cursor:pointer;background:#38bdf8;color:#06283a;font-weight:700}
+.launch{background:#1e293b;border:1px solid #334155;border-radius:14px;padding:16px;margin:10px 0}
+.launch.isro{border-color:#f97316;background:#271a0e}
+.launch h3{font-size:1rem}
+.count{font-size:1.5rem;font-weight:800;color:#38bdf8;font-variant-numeric:tabular-nums}
+.launch .meta{color:#94a3b8;font-size:.82rem;margin-top:4px}
+section{padding:18px 0}
+h2{font-size:1.1rem}
+p,li{color:#cbd5e1;font-size:.9rem}
+ul{margin-left:18px}
+.src{color:#64748b;font-size:.75rem;margin-top:10px}
+.status{margin-top:10px;color:#94a3b8;font-size:.85rem}
+</style>
+</head>
+<body>
+<div class="wrap">
+<header>
+  <h1>🚀 ISRO Tracker — Next Launches</h1>
+  <p class="sub">Live upcoming rocket launches from ISRO and around the world, with countdowns. Data loads automatically from the Launch Library 2 open API.</p>
+  <div class="btns"><button id="refresh">🔄 Load next launches</button></div>
+  <div id="status" class="status">Click the button (or wait 2 seconds) to fetch live launch data…</div>
+</header>
+
+<div id="launches"></div>
+
+<section>
+  <h2>ISRO missions to know</h2>
+  <ul>
+    <li><strong>Gaganyaan</strong> — India's first crewed spaceflight programme; uncrewed test flights precede the crewed mission.</li>
+    <li><strong>Chandrayaan-3</strong> — made India the first country to soft-land near the lunar south pole (23 August 2023).</li>
+    <li><strong>Aditya-L1</strong> — India's first dedicated solar observatory, stationed at the L1 point.</li>
+    <li><strong>NISAR</strong> — NASA–ISRO Synthetic Aperture Radar satellite for Earth observation, launched on India's GSLV.</li>
+    <li><strong>SpaDeX</strong> — in-space docking demonstration, key to future Indian space station plans.</li>
+  </ul>
+</section>
+
+<section>
+  <h2>ISRO's launch vehicles</h2>
+  <p><strong>PSLV</strong> — the reliable workhorse for small/medium satellites. <strong>GSLV Mk II/III</strong> — heavier payloads and flagship missions; the LVM3 launches Chandrayaan-class missions and will carry Gaganyaan. <strong>SSLV</strong> — a small-satellite quick-turnaround rocket. <strong>Rocket module / NGLV</strong> — the next-generation heavy-lift vehicle in development.</p>
+  <p class="src">Data: Launch Library 2 (thespacedevs.com) — free community API · Times shown in IST. This is an independent tracker, not an official ISRO site.</p>
+</section>
+</div>
+
+<script>
+var ISRO_AGENCY = "Indian Space Research Organisation";
+function esc(s){var d=document.createElement("div");d.textContent=s==null?"":s;return d.innerHTML}
+function cd(net){var ms=new Date(net)-Date.now();if(ms<0)return"T-"+Math.round(-ms/60000)+" min";
+  var d=Math.floor(ms/86400000),h=Math.floor(ms/3600000)%24,m=Math.floor(ms/60000)%60,s=Math.floor(ms/1000)%60;
+  return "T– "+d+"d "+String(h).padStart(2,"0")+":"+String(m).padStart(2,"0")+":"+String(s).padStart(2,"0")}
+function render(list){
+  var el=document.getElementById("launches");el.innerHTML="";
+  if(!list.length){el.innerHTML="<p>No upcoming launches in the feed right now.</p>";return}
+  list.slice(0,12).forEach(function(l){
+    var isro=(l.agency||"").indexOf("Indian Space")>=0;
+    var d=document.createElement("div");d.className="launch"+(isro?" isro":"");
+    d.innerHTML="<h3>"+(isro?"🇮🇳 ":"🛰️ ")+esc(l.name)+"</h3>"+
+      "<div class='count' data-net='"+esc(l.net)+"'>"+cd(l.net)+"</div>"+
+      "<div class='meta'>"+esc(l.agency)+" · "+esc(new Date(l.net).toLocaleString("en-IN",{timeZone:"Asia/Kolkata"}))+" IST · "+esc(l.status)+"</div>";
+    el.appendChild(d);
+  });
+}
+function tick(){document.querySelectorAll(".count").forEach(function(e){e.textContent=cd(e.getAttribute("data-net"))})}
+function load(){
+  var st=document.getElementById("status");st.textContent="Fetching from Launch Library 2…";
+  fetch("https://ll.thespacedevs.com/2.2.0/launch/upcoming/?limit=20&mode=list")
+    .then(function(r){return r.json()}).then(function(d){
+      var list=d.results.map(function(r){return{name:r.name,agency:(r.launch_service_provider||{}).name,net:r.net,status:(r.status||{}).name}});
+      list.sort(function(a,b){return new Date(a.net)-new Date(b.net)});
+      render(list);tick();st.textContent="✅ Live launch list updated "+new Date().toLocaleTimeString("en-IN",{timeZone:"Asia/Kolkata"})+" IST";
+    }).catch(function(){st.textContent="Could not reach Launch Library 2 (rate limit) — retry in a minute. ISRO reference info below is always available."});
+}
+document.getElementById("refresh").addEventListener("click",load);
+setTimeout(load,1500);
+setInterval(tick,1000);
+</script>
+</body>
+</html>
